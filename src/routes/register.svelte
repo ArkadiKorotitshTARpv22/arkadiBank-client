@@ -1,23 +1,29 @@
 <script>
-    import { goto, stores } from '@sapper/app';
-    import { post } from 'utils.js';
-    const { session } = stores();
+    import {goto, stores} from '@sapper/app';
+    import {post} from 'utils.js';
+
+    const {session} = stores();
+
     let username = '';
-    let name = '';
+    let email = '';
     let password = '';
     let error = null;
-    async function submit(event) {
-        const response = await post(`auth/register`, { username, name, password });
 
+    async function submit(event) {
+        const response = await post(`auth/register`, {username, email, password});
+
+        // TODO handle network errors
         error = response.error;
-        if (response.id) {
-            goto('/');
+
+        if (response.user) {
+            $session.user = response.user;
+            await goto('/');
         }
     }
 </script>
 
 <svelte:head>
-    <title>Sign up • BarBank</title>
+    <title>Sign up • barBank</title>
 </svelte:head>
 
 <div class="auth-page">
@@ -29,19 +35,24 @@
                     <a href="/login">Have an account?</a>
                 </p>
                 {#if error}
-                    <div class="alert alert-danger" role="alert">{error}</div>
+                    <div class="alert-danger" role="alert">{error}</div>
                 {/if}
 
                 <form on:submit|preventDefault={submit}>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="text" required placeholder="Your username" bind:value={username}>
+                        <input class="form-control form-control-lg" type="text" required placeholder="Your Name"
+                               bind:value={username}>
                     </fieldset>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="text" required placeholder="Name" bind:value={name}>
+                        <input class="form-control form-control-lg" type="text" required placeholder="Email"
+                               bind:value={email}>
                     </fieldset>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="password" required placeholder="Password" bind:value={password}>
-                        {#if password.length > 1 && password.length < 6 }<sup><div class="alert alert-danger" role="alert">Password to short</div></sup>{/if}
+                        <input class="form-control form-control-lg" type="password" required placeholder="Password"
+                               bind:value={password}>
+                        {#if password.length >= 1 && password.length <= 6}<sup>
+                            <div class="alert-danger" role="alert">Password is too short</div>
+                        </sup>{/if}
                     </fieldset>
                     <button class="btn btn-lg btn-primary pull-xs-right" disabled="{password.length < 6}">
                         Sign up

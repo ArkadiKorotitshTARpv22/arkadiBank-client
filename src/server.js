@@ -8,13 +8,13 @@ import sessionFileStore from 'session-file-store'; // npm install session-file-s
 const { json } = require('body-parser');
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
-const FileStore = new sessionFileStore(session);// faili salvestamine
+const FileStore = new sessionFileStore(session);	// faili salvestamine
 polka() // You can also use Express
 	.use(
 		compression({ threshold: 0 }),
 		json(),
 		session({
-			secret: 'iiiirrrr', //suvaline EI tohi githubi panna
+			secret: 'markiz', //suvaline EI tohi githubi panna
 			resave: true,
 			saveUninitialized: true,
 			cookie: {
@@ -27,10 +27,11 @@ polka() // You can also use Express
 		sirv('static', { dev }),
 		sapper.middleware({
 			session: req => ({
-				user: req.session && req.session.user
+				user: req.session && req.session.user,
+				token: req.session && req.session.token,
 			})
 		})
 	)
 	.listen(PORT, err => {
 		if (err) console.log('error', err);
-	});
+	}); //can register
